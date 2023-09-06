@@ -176,7 +176,8 @@ export default dynamic(() => Promise.resolve(() => {
     console.log(daoInput);
     console.log(userInput);
     console.log(userSig);
-    console.log(daoInput.token?.amount! - BigInt(daoQty));
+    console.log(daoInput.token.amount);
+    console.log(daoInput.token.amount - BigInt(50));
     const transaction = func().from(daoInput).fromP2PKH(userInput, userSig).to([
       // contract pass-by
       {
@@ -184,7 +185,7 @@ export default dynamic(() => Promise.resolve(() => {
         amount: BigInt(800),
         token: {
           category: daoInput.token?.category!,
-          amount: daoInput.token?.amount! - BigInt(daoQty+1),
+          amount: daoInput.token.amount - BigInt(50),
           nft: {
             capability: "minting",
             commitment: ""
