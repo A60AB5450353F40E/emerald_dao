@@ -106,7 +106,7 @@ export default dynamic(() => Promise.resolve(() => {
       const utxos = await connectedWallet.getAddressUtxos();
       setWalletBalance(utxos.reduce((prev, cur) => cur.satoshis + prev, 0));
 
-      const tokenUtxos = utxos.filter(utxo => utxo.token?.tokenId === tokenId).sort((a, b) => binToNumberUint16LE(hexToBin(a.token!.commitment!)) - binToNumberUint16LE(hexToBin(b.token!.commitment!)));
+      const tokenUtxos = utxos.filter(utxo => utxo.token?.tokenId === tokenId);
       setTokens(tokenUtxos.map(val => val.token!.commitment!));
 
       connectedWallet.provider.watchAddressStatus(connectedAddress!, async () => {
@@ -171,8 +171,14 @@ export default dynamic(() => Promise.resolve(() => {
 
     const func = popcornStandContract.getContractFunction("MakePopcorn");
     console.log(daoInput);
+    //console.log(userWallet.provider.getRawTransactionObject("a530363c3dc766676723cdfda919473c93647f0a3b899f3e38bfe3747a8881b6", true));
     console.log(userInput);
     console.log(userSig);
+    const sourceTX = (await userWallet.provider.getRawTransactionObject("a530363c3dc766676723cdfda919473c93647f0a3b899f3e38bfe3747a8881b6", true));
+    const sourceAmount = BigInt(sourceTX.vout[0].tokenData.amount);
+    console.log(sourceTX);
+    console.log(sourceAmount);
+    console.log(BigInt(sourceAmount));
     console.log(daoInput.token.amount);
     console.log(daoInput.token.amount - BigInt(50));
     const transaction = func().from(daoInput).fromP2PKH(userInput, userSig).to([
@@ -182,7 +188,7 @@ export default dynamic(() => Promise.resolve(() => {
         amount: BigInt(800),
         token: {
           category: daoInput.token?.category!,
-          amount: daoInput.token.amount - BigInt(50),
+          amount: sourceAmount - BigInt(50),
           nft: {
             capability: "minting",
             commitment: ""
@@ -276,8 +282,8 @@ export default dynamic(() => Promise.resolve(() => {
       const utxos = await userWallet.getAddressUtxos();
       setWalletBalance(utxos.reduce((prev, cur) => cur.satoshis + prev, 0));
 
-      const tokenUtxos = utxos.filter(utxo => utxo.token?.tokenId === tokenId).sort((a, b) => binToNumberUint16LE(hexToBin(a.token!.commitment!)) - binToNumberUint16LE(hexToBin(b.token!.commitment!)));
-      setTokens(tokenUtxos.map(val => val.token!.commitment!));
+      const tokenUtxos = utxos.filter(utxo => utxo.token?.tokenId === tokenId);
+      setTokens(tokenUtxos.map());
     }
   }, [tokenId, contractAddress, connectedAddress, setWalletBalance, setTokens]);
 
