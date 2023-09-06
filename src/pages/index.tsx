@@ -152,14 +152,11 @@ export default dynamic(() => Promise.resolve(() => {
 
     const txfee = daoPrice;
 
-    let daoInput: Utxo = {} as any;
-    const daoUtxos = await popcornStandContract.getUtxos();
-    for (let i=0; i<daoUtxos.length; i++) {
-      if (daoUtxos[i].token?.tokenId == daoId) {
-        daoInput = toCashScript(daoUtxos[i]);
-        break;
-      }
-    }
+    const daoUtxos = (await popcornStandContract.getUtxos()).map(toCashScript).filter(
+        val => val.token.category == daoId
+    );
+    console.log(daoUtxos);
+    const daoInput = daoUtxos[0];
 
     const userUtxos = (await userWallet.getAddressUtxos()).map(toCashScript).filter(
       val => !val.token && val.satoshis >= (txfee + 800*2),
